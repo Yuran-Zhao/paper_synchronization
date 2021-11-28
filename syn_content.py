@@ -1,9 +1,14 @@
+import logging
 import os
 import time
 from db_utils import MD5DB, paperDB
 from hashlib import md5
 import re
 from tqdm import tqdm
+from utils import config_logger
+
+config_logger(logging.INFO)
+# logger = logging.getLogger(__name__)
 
 
 def synchronize_content(root, interval):
