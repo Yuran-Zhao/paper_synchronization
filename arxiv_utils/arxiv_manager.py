@@ -24,12 +24,15 @@ class arxivManager(object):
             self.arxiv_number = arxiv_number
         soup = self.obtain_soup(self.arxiv_number)
         if soup is None:
-            logging.waring("Can't build the arxivMananer Object")
-            return
-        self.papername = papername if papername is not None else self.parse_papername(
-            soup)
+            logging.warning("Can't build the arxivMananer Object")
+            exit(1)
+        self.papername = self.parse_papername(soup)
         self.authors = self.parse_authors(soup)
         self.submission_date = self.parse_submission_date(soup)
+
+    def __repr__(self) -> str:
+        return 'Title: {}\nAuthors{}\nSubmission Date{}'.format(
+            self.papername, self.authors, self.submission_date)
 
     def obtain_arxiv_number_by_papername(self, papername):
         query = urlencode({'query': papername})
