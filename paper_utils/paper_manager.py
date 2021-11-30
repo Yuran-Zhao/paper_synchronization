@@ -6,11 +6,13 @@ from arxiv_utils import arxivManager
 
 class paperManager(object):
     def __init__(self, all_lines):
+        tmp = all_lines.split('\n')
+        all_lines = [line for line in tmp if line.strip() != '']
         self.n_lines = len(all_lines)
         self.markers = [0] * self.n_lines
-
-        self.title_pattern = re.compile(r"##### [\d*. ]?([a-zA-Z0-9 -?:!]+)")
-        self.title = self.parse_title(all_lines)
+        self.markers[0] = 1
+        # self.title_pattern = re.compile(r"##### [\d*. ]?([a-zA-Z0-9 -?:!]+)")
+        self.title = all_lines[0]
 
         self.arxiv_number_pattern = re.compile(r'\d+.\d+')
         self.arxiv_number = self.parse_arxiv_number(all_lines)
@@ -28,15 +30,15 @@ class paperManager(object):
         self.arxiv_number = self.arxiv_info.arxiv_number
         self.title = self.arxiv_info.papername
 
-    def parse_title(self, lines):
-        for i in range(self.n_lines):
-            if self.markers[i] == 1:
-                continue
-            papername = re.findall(self.title_pattern, lines[i])
-            if len(papername) > 0:
-                self.markers[i] = 1
-                return papername[0]
-        return None
+    # def parse_title(self, lines):
+    #     for i in range(self.n_lines):
+    #         if self.markers[i] == 1:
+    #             continue
+    #         papername = re.findall(self.title_pattern, lines[i])
+    #         if len(papername) > 0:
+    #             self.markers[i] = 1
+    #             return papername[0]
+    #     return None
 
     def parse_arxiv_number(self, lines):
         for i in range(self.n_lines):
@@ -62,12 +64,16 @@ class paperManager(object):
         comments = []
         for i in range(self.n_lines):
             if self.markers[i] == 0:
-                comments.append(lines[i])
+                comments.append(lines[i] + '\n')
+        # TODO: in order to look better so add another blank line
         return '' if comments == [] else '\n'.join(comments)
 
     def format(self):
-        title = '##### {} (arXiv: {}; Authors: {}; Submission Date: {})'.format(
-            self.title, self.arxiv_number, ', '.join(self.authors),
-            self.submission_date)
+        title = '##### {} (Authors: {}; Submission Date: {})\n{}'.format(
+            self.title, ', '.join(self.authors), self.submission_date,
+            self.arxiv_number)
         tag = 'Tags: {}'.format(', '.join(self.tag))
         return [title, tag, self.comment]
+
+    def __repr__(self) -> str:
+        return '\n'.join(self.format())
