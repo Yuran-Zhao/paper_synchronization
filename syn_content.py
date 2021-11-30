@@ -31,18 +31,8 @@ def update(root, prefix, content):
     paper_db = paperDB(root, prefix)
     previous_papers = paper_db.get_all_saved_papers()
     lines = content.split('\n')
-    cur_papers = find_papers_in_file(lines)
+    cur_papers = find_papername_in_file(lines)
     # ignore the possible deleted papers
     new_papers = set(cur_papers) - set(previous_papers)
     for paper in new_papers:
         paper_db.insert(paper)
-
-
-def find_papers_in_file(lines):
-    pattern = re.compile(r"##### [\d*. ]?([a-zA-Z0-9 -?:!]+) \([0-9a-zA-Z]+")
-    papers = []
-    for line in lines:
-        papername = re.findall(pattern, line)
-        if len(papername) > 0:
-            papers.append(papername[0].strip())
-    return papers
